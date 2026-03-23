@@ -3,111 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Planer v17 - Pełna Opcja</title>
+    <title>Planer v18</title>
     <style>
-        :root { --bg: #f0f2f5; --ania: #ff7675; --oliwier: #74b9ff; --purple: #8e44ad; }
+        :root { --bg: #f0f2f5; --ania: #ff7675; --oliwier: #74b9ff; --purp: #8e44ad; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: sans-serif; background: var(--bg); padding: 10px; }
+        body { font-family: sans-serif; background: var(--bg); padding: 10px; line-height: 1.4; }
 
+        /* Login */
         #loginScreen { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
-        .u-btn { width: 80%; max-width: 300px; padding: 20px; margin: 10px; border: none; border-radius: 15px; color: white; font-size: 20px; font-weight: bold; cursor: pointer; }
+        .u-btn { width: 80%; max-width: 300px; padding: 18px; margin: 10px; border: none; border-radius: 15px; color: white; font-size: 18px; font-weight: bold; cursor: pointer; }
 
-        .main-wrapper { display: none; max-width: 1200px; margin: 0 auto; gap: 20px; padding-top: 20px; }
-
-        @media (min-width: 900px) {
-            .main-wrapper.active { display: grid; grid-template-columns: 1fr 400px; }
-            .top-stats { grid-column: span 2; }
+        /* Layout */
+        .wrapper { display: none; max-width: 1100px; margin: 0 auto; flex-direction: column; gap: 15px; }
+        @media (min-width: 850px) { 
+            .wrapper.active { display: grid; grid-template-columns: 1fr 380px; padding-top: 20px; }
+            .stats { grid-column: span 2; }
         }
-        @media (max-width: 899px) { .main-wrapper.active { display: flex; flex-direction: column; } }
+        @media (max-width: 849px) { .wrapper.active { display: flex; } }
 
-        .top-stats { display: flex; gap: 10px; width: 100%; margin-bottom: 10px; }
-        .s-card { flex: 1; background: white; padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-bottom: 5px solid #ddd; }
-        .s-num { display: block; font-size: 24px; font-weight: bold; }
+        /* Stats */
+        .stats { display: flex; gap: 8px; margin-bottom: 5px; }
+        .s-card { flex: 1; background: white; padding: 12px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 4px solid #ddd; }
+        .s-num { display: block; font-size: 20px; font-weight: bold; }
 
-        .white-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .grid-7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; }
-        .d-cell { border: 1px solid #eee; border-radius: 8px; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; position: relative; }
-        .d-cell.active { background: var(--purple); color: white; }
-        .dot { width: 5px; height: 5px; border-radius: 50%; background: red; position: absolute; bottom: 3px; }
+        /* Boxes */
+        .card { background: white; padding: 15px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; }
+        .cell { border: 1px solid #f0f0f0; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; font-size: 14px; position: relative; }
+        .cell.active { background: var(--purp); color: white; }
+        .dot { width: 4px; height: 4px; background: red; border-radius: 50%; position: absolute; bottom: 3px; }
 
-        .t-item { background: #f9f9f9; padding: 12px; margin: 10px 0; border-radius: 12px; border-left: 6px solid #ccc; position: relative; }
-        .t-btns { position: absolute; right: 10px; top: 10px; display: flex; gap: 10px; }
-        .map-link { display: inline-block; margin-top: 5px; color: #0984e3; text-decoration: none; font-size: 13px; font-weight: bold; }
+        /* Task Cards */
+        .task { background: #f8f9fa; padding: 10px; margin: 8px 0; border-radius: 10px; border-left: 5px solid #ccc; position: relative; }
+        .t-actions { position: absolute; right: 8px; top: 8px; }
+        .t-btn { background: none; border: none; cursor: pointer; font-size: 16px; margin-left: 5px; }
+        .map-b { display: inline-block; margin-top: 4px; color: #0984e3; text-decoration: none; font-size: 12px; font-weight: bold; }
 
-        input, textarea, select { width: 100%; padding: 12px; margin: 5px 0; border-radius: 10px; border: 1px solid #ccc; font-size: 16px; }
-        .save-btn { background: var(--purple); color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; margin-top: 10px; cursor: pointer; }
-        
-        .color-picker { display: flex; gap: 10px; margin: 10px 0; justify-content: center; }
-        .c-opt { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; }
-        .c-opt.selected { border-color: black; }
+        /* Form */
+        input, textarea, select { width: 100%; padding: 10px; margin: 4px 0; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
+        .colors { display: flex; gap: 8px; margin: 8px 0; justify-content: center; }
+        .c-circle { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+        .c-circle.sel { border-color: #333; }
+        .btn-main { background: var(--purp); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
 
-        #ov-back { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 8000; padding: 20px; }
-        .ov-front { background: white; padding: 20px; border-radius: 20px; max-width: 500px; margin: 20px auto; max-height: 80vh; overflow-y: auto; }
-        .logout-x { position: fixed; top: 10px; right: 10px; z-index: 500; padding: 5px 10px; background: #333; color: white; border-radius: 5px; font-size: 12px; }
+        /* Overlay */
+        #ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 8000; padding: 20px; }
+        .ov-c { background: white; padding: 20px; border-radius: 20px; max-width: 500px; margin: auto; max-height: 85vh; overflow-y: auto; position: relative; top: 50%; transform: translateY(-50%); }
+
+        .logout { position: fixed; top: 5px; right: 5px; z-index: 1000; padding: 4px 8px; background: #333; color: white; border-radius: 5px; font-size: 10px; border: none; }
     </style>
 </head>
 <body>
 
     <div id="loginScreen">
         <h2 style="margin-bottom:20px">Planer Ani i Oliwiera</h2>
-        <button class="u-btn" style="background:var(--ania)" onclick="start('Ania')">Ania</button>
-        <button class="u-btn" style="background:var(--oliwier)" onclick="start('Oliwier')">Oliwier</button>
+        <button class="u-btn" style="background:var(--ania)" onclick="init('Ania')">Ania</button>
+        <button class="u-btn" style="background:var(--oliwier)" onclick="init('Oliwier')">Oliwier</button>
     </div>
 
-    <button class="logout-x" onclick="location.reload()">Wyloguj</button>
+    <button class="logout" onclick="location.reload()">Wyloguj</button>
 
-    <div id="ov-back" onclick="if(event.target==this)this.style.display='none'">
-        <div class="ov-front">
+    <div id="ov" onclick="if(event.target==this)this.style.display='none'">
+        <div class="ov-c">
             <h2 id="ov-t">Lista</h2>
             <div id="ov-l"></div>
-            <button onclick="document.getElementById('ov-back').style.display='none'" style="width:100%; padding:10px; margin-top:15px">Zamknij</button>
+            <button onclick="document.getElementById('ov').style.display='none'" style="width:100%; padding:10px; margin-top:15px">Zamknij</button>
         </div>
     </div>
 
-    <div class="main-wrapper" id="app">
-        <div class="top-stats">
-            <div class="s-card" style="border-color:#f1c40f" onclick="showStatus('nie')"><span class="s-num" id="s-n">0</span><small>Czeka</small></div>
-            <div class="s-card" style="border-color:#3498db" onclick="showStatus('trwa')"><span class="s-num" id="s-t">0</span><small>W trakcie</small></div>
-            <div class="s-card" style="border-color:#2ecc71" onclick="showStatus('zak')"><span class="s-num" id="s-z">0</span><small>Gotowe</small></div>
+    <div class="wrapper" id="app">
+        <div class="stats">
+            <div class="s-card" style="border-color:#f1c40f" onclick="showS('nie')"><span class="s-num" id="sn">0</span><small>Czeka</small></div>
+            <div class="s-card" style="border-color:#3498db" onclick="showS('trwa')"><span class="s-num" id="st">0</span><small>Trwa</small></div>
+            <div class="s-card" style="border-color:#2ecc71" onclick="showS('zak')"><span class="s-num" id="sz">0</span><small>Gotowe</small></div>
         </div>
 
-        <div class="white-card">
+        <div class="card">
             <div style="display:flex; justify-content: space-between; align-items: center;">
-                <button onclick="moveMonth(-1)" style="padding:10px">←</button>
-                <h2 id="month-name"></h2>
-                <button onclick="moveMonth(1)" style="padding:10px">→</button>
+                <button onclick="chM(-1)" style="padding:5px 10px">←</button>
+                <h3 id="m-name"></h3>
+                <button onclick="chM(1)" style="padding:5px 10px">→</button>
             </div>
-            <div id="calendar" class="grid-7"></div>
+            <div id="calendar" class="grid"></div>
         </div>
 
-        <div class="white-card">
-            <h2 id="day-label">Zadania</h2>
-            <div id="day-tasks"></div>
-            <hr style="margin:20px 0; opacity:0.1">
-            <h3 id="form-mode">+ Nowe zadanie</h3>
-            <input type="text" id="f-title" placeholder="Co robimy?">
-            <input type="text" id="f-loc" placeholder="Gdzie? (Lokalizacja)">
-            <div style="display:flex; gap:5px"><input type="time" id="f-s"><input type="time" id="f-e"></div>
-            <textarea id="f-desc" placeholder="Szczegóły..."></textarea>
+        <div class="card">
+            <h3 id="d-name">Dzisiaj</h3>
+            <div id="task-list"></div>
+            <hr style="margin:15px 0; opacity:0.1">
+            <h4 id="f-mode">+ Nowe zadanie</h4>
+            <input type="text" id="f-t" placeholder="Co robimy?">
+            <input type="text" id="f-l" placeholder="Gdzie? (Lokalizacja)">
+            <div style="display:flex; gap:5px"><input type="time" id="f-h1"><input type="time" id="f-h2"></div>
+            <textarea id="f-d" placeholder="Opis..." rows="2"></textarea>
             
-            <div class="color-picker">
-                <div class="c-opt selected" style="background:#8e44ad" data-color="#8e44ad" onclick="selCol(this)"></div>
-                <div class="c-opt" style="background:#e67e22" data-color="#e67e22" onclick="selCol(this)"></div>
-                <div class="c-opt" style="background:#2ecc71" data-color="#2ecc71" onclick="selCol(this)"></div>
-                <div class="c-opt" style="background:#3498db" data-color="#3498db" onclick="selCol(this)"></div>
+            <div class="colors">
+                <div class="c-circle sel" style="background:#8e44ad" data-c="#8e44ad" onclick="sCol(this)"></div>
+                <div class="c-circle" style="background:#e67e22" data-c="#e67e22" onclick="sCol(this)"></div>
+                <div class="c-circle" style="background:#2ecc71" data-c="#2ecc71" onclick="sCol(this)"></div>
+                <div class="c-circle" style="background:#3498db" data-c="#3498db" onclick="sCol(this)"></div>
+                <div class="c-circle" style="background:#e84393" data-c="#e84393" onclick="sCol(this)"></div>
             </div>
 
-            <div style="display:flex; justify-content: space-around; padding:10px 0">
-                <label><input type="checkbox" id="c-ania"> Ania</label>
-                <label><input type="checkbox" id="c-oli"> Oliwier</label>
+            <div style="display:flex; justify-content: space-around; padding:5px 0">
+                <label><input type="checkbox" id="c-a"> Ania</label>
+                <label><input type="checkbox" id="c-o"> Oliwier</label>
             </div>
-            <select id="f-stat">
+            <select id="f-st">
                 <option value="nie">Czeka</option>
                 <option value="trwa">W trakcie</option>
-                <option value="zak">Gotowe</option>
+                <option value="zak">Zakończone</option>
             </select>
-            <input type="hidden" id="edit-id">
-            <button class="save-btn" id="btn-save" onclick="saveTask()">DODAJ ZADANIE</button>
+            <input type="hidden" id="e-id">
+            <button class="btn-main" id="b-s" onclick="save()">ZAPISZ ZADANIE</button>
         </div>
     </div>
 
@@ -125,130 +133,126 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let selD = new Date(), viewD = new Date(), allTasks = [], chosenCol = "#8e44ad";
+        let selD = new Date(), viewD = new Date(), tasks = [], curC = "#8e44ad";
 
-        function start(u) {
-            document.getElementById('loginScreen').style.display = 'none';
+        function init(u) {
+            document.getElementById('loginScreen').style.display='none';
             document.getElementById('app').classList.add('active');
-            document.getElementById('c-ania').checked = (u==='Ania');
-            document.getElementById('c-oli').checked = (u==='Oliwier');
+            document.getElementById('c-a').checked = (u==='Ania');
+            document.getElementById('c-o').checked = (u==='Oliwier');
             db.collection("tasks").onSnapshot(s => {
-                allTasks = [];
-                s.forEach(d => allTasks.push({id: d.id, ...d.data()}));
-                refresh();
+                tasks = [];
+                s.forEach(d => tasks.push({id: d.id, ...d.data()}));
+                render();
             });
         }
 
-        function refresh() {
-            document.getElementById('s-n').innerText = allTasks.filter(t => t.status==='nie').length;
-            document.getElementById('s-t').innerText = allTasks.filter(t => t.status==='trwa').length;
-            document.getElementById('s-z').innerText = allTasks.filter(t => t.status==='zak').length;
+        function render() {
+            document.getElementById('sn').innerText = tasks.filter(t => t.status==='nie').length;
+            document.getElementById('st').innerText = tasks.filter(t => t.status==='trwa').length;
+            document.getElementById('sz').innerText = tasks.filter(t => t.status==='zak').length;
 
-            const grid = document.getElementById('calendar'); grid.innerHTML = '';
+            const g = document.getElementById('calendar'); g.innerHTML = '';
             const m = viewD.getMonth(), y = viewD.getFullYear();
             const names = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
-            document.getElementById('month-name').innerText = `${names[m]} ${y}`;
-            const first = (new Date(y, m, 1).getDay() + 6) % 7;
+            document.getElementById('m-name').innerText = `${names[m]} ${y}`;
+            const f = (new Date(y, m, 1).getDay() + 6) % 7;
             const days = new Date(y, m + 1, 0).getDate();
-            for(let i=0; i<first; i++) grid.appendChild(document.createElement('div'));
+            for(let i=0; i<f; i++) g.appendChild(document.createElement('div'));
             for(let d=1; d<=days; d++) {
                 const dt = new Date(y, m, d);
                 const iso = dt.toISOString().split('T')[0];
                 const c = document.createElement('div');
-                c.className = 'd-cell' + (dt.toDateString() === selD.toDateString() ? ' active' : '');
+                c.className = 'cell' + (dt.toDateString() === selD.toDateString() ? ' active' : '');
                 c.innerText = d;
-                if(allTasks.some(t => t.date === iso)) {
+                if(tasks.some(t => t.date === iso)) {
                     const dot = document.createElement('div'); dot.className = 'dot';
                     c.appendChild(dot);
                 }
-                c.onclick = () => { selD = dt; refresh(); resetForm(); };
-                grid.appendChild(c);
+                c.onclick = () => { selD = dt; render(); resetF(); };
+                g.appendChild(c);
             }
 
-            const list = document.getElementById('day-tasks'); list.innerHTML = '';
-            document.getElementById('day-label').innerText = selD.toLocaleDateString('pl-PL', {day:'numeric', month:'long'});
-            allTasks.filter(t => t.date === selD.toISOString().split('T')[0]).forEach(t => list.appendChild(item(t)));
+            const l = document.getElementById('task-list'); l.innerHTML = '';
+            document.getElementById('d-name').innerText = selD.toLocaleDateString('pl-PL', {day:'numeric', month:'long'});
+            tasks.filter(t => t.date === selD.toISOString().split('T')[0]).forEach(t => l.appendChild(makeT(t)));
         }
 
-        function item(t) {
-            const div = document.createElement('div');
-            div.className = 't-item';
-            div.style.borderLeftColor = t.color || var(--purple);
-            div.innerHTML = `
-                <div class="t-btns">
-                    <button onclick="editT('${t.id}')" style="background:none; border:none; cursor:pointer">✏️</button>
-                    <button onclick="delTask('${t.id}')" style="background:none; border:none; cursor:pointer">🗑️</button>
+        function makeT(t) {
+            const d = document.createElement('div');
+            d.className = 'task';
+            d.style.borderLeftColor = t.color || '#8e44ad';
+            d.innerHTML = `
+                <div class="t-actions">
+                    <button class="t-btn" onclick="editT('${t.id}')">✏️</button>
+                    <button class="t-btn" onclick="delT('${t.id}')">🗑️</button>
                 </div>
                 <strong>${t.time || ''} ${t.title}</strong><br>
                 <small>${t.who.join(', ')}</small>
-                ${t.loc ? `<br><a class="map-link" href="https://www.google.com/maps/search/${encodeURIComponent(t.loc)}" target="_blank">🌍 Mapa: ${t.loc}</a>` : ''}
+                ${t.loc ? `<br><a class="map-b" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(t.loc)}" target="_blank">🌍 Mapa: ${t.loc}</a>` : ''}
             `;
-            return div;
+            return d;
         }
 
         function editT(id) {
-            const t = allTasks.find(x => x.id === id);
-            document.getElementById('f-title').value = t.title;
-            document.getElementById('f-loc').value = t.loc || '';
-            document.getElementById('f-s').value = t.time || '';
-            document.getElementById('f-e').value = t.endTime || '';
-            document.getElementById('f-desc').value = t.desc || '';
-            document.getElementById('f-stat').value = t.status;
-            document.getElementById('c-ania').checked = t.who.includes('Ania');
-            document.getElementById('c-oli').checked = t.who.includes('Oliwier');
-            document.getElementById('edit-id').value = id;
-            document.getElementById('form-mode').innerText = "📝 Edytuj zadanie";
-            document.getElementById('btn-save').innerText = "ZAPISZ ZMIANY";
-            chosenCol = t.color || "#8e44ad";
+            const t = tasks.find(x => x.id === id);
+            document.getElementById('f-t').value = t.title;
+            document.getElementById('f-l').value = t.loc || '';
+            document.getElementById('f-h1').value = t.time || '';
+            document.getElementById('f-h2').value = t.endTime || '';
+            document.getElementById('f-d').value = t.desc || '';
+            document.getElementById('f-st').value = t.status;
+            document.getElementById('c-a').checked = t.who.includes('Ania');
+            document.getElementById('c-o').checked = t.who.includes('Oliwier');
+            document.getElementById('e-id').value = id;
+            document.getElementById('f-mode').innerText = "📝 Edytuj";
+            document.getElementById('b-s').innerText = "ZAPISZ ZMIANY";
+            curC = t.color || "#8e44ad";
             window.scrollTo(0, document.body.scrollHeight);
         }
 
-        function resetForm() {
-            document.getElementById('f-title').value = '';
-            document.getElementById('f-loc').value = '';
-            document.getElementById('edit-id').value = '';
-            document.getElementById('form-mode').innerText = "+ Nowe zadanie";
-            document.getElementById('btn-save').innerText = "DODAJ ZADANIE";
+        function resetF() {
+            document.getElementById('f-t').value = ''; document.getElementById('f-l').value = '';
+            document.getElementById('e-id').value = ''; document.getElementById('f-mode').innerText = "+ Nowe zadanie";
+            document.getElementById('b-s').innerText = "DODAJ ZADANIE";
         }
 
-        function selCol(el) {
-            document.querySelectorAll('.c-opt').forEach(x => x.classList.remove('selected'));
-            el.classList.add('selected');
-            chosenCol = el.dataset.color;
+        function sCol(el) {
+            document.querySelectorAll('.c-circle').forEach(x => x.classList.remove('sel'));
+            el.classList.add('sel');
+            curC = el.dataset.c;
         }
 
-        function showStatus(s) {
+        function showS(s) {
             const l = document.getElementById('ov-l'); l.innerHTML = '';
-            document.getElementById('ov-t').innerText = s==='nie'?'Czeka':s==='trwa'?'W trakcie':'Gotowe';
-            allTasks.filter(t => t.status === s).forEach(t => l.appendChild(item(t)));
-            document.getElementById('ov-back').style.display = 'block';
+            document.getElementById('ov-t').innerText = s==='nie'?'Czeka':s==='trwa'?'Trwa':'Gotowe';
+            tasks.filter(t => t.status === s).forEach(t => l.appendChild(makeT(t)));
+            document.getElementById('ov').style.display = 'block';
         }
 
-        async function saveTask() {
-            const title = document.getElementById('f-title').value;
-            const id = document.getElementById('edit-id').value;
-            if(!title) return;
-            const who = [];
-            if(document.getElementById('c-ania').checked) who.push('Ania');
-            if(document.getElementById('c-oli').checked) who.push('Oliwier');
-            
+        async function save() {
+            const t = document.getElementById('f-t').value;
+            const id = document.getElementById('e-id').value;
+            if(!t) return;
+            const w = [];
+            if(document.getElementById('c-a').checked) w.push('Ania');
+            if(document.getElementById('c-o').checked) w.push('Oliwier');
             const data = {
-                title, date: selD.toISOString().split('T')[0],
-                loc: document.getElementById('f-loc').value,
-                time: document.getElementById('f-s').value,
-                endTime: document.getElementById('f-e').value,
-                desc: document.getElementById('f-desc').value,
-                who, status: document.getElementById('f-stat').value,
-                color: chosenCol
+                title: t, date: selD.toISOString().split('T')[0],
+                loc: document.getElementById('f-l').value,
+                time: document.getElementById('f-h1').value,
+                endTime: document.getElementById('f-h2').value,
+                desc: document.getElementById('f-d').value,
+                who: w, status: document.getElementById('f-st').value,
+                color: curC
             };
-
             if(id) await db.collection("tasks").doc(id).update(data);
             else await db.collection("tasks").add(data);
-            resetForm();
+            resetF();
         }
 
-        async function delTask(id) { if(confirm("Usunąć?")) await db.collection("tasks").doc(id).delete(); }
-        function moveMonth(v) { viewD.setMonth(viewD.getMonth() + v); refresh(); }
+        async function delT(id) { if(confirm("Usunąć?")) await db.collection("tasks").doc(id).delete(); }
+        function chM(v) { viewD.setMonth(viewD.getMonth() + v); render(); }
     </script>
 </body>
 </html>
