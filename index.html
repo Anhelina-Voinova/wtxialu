@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planer Ani i Oliwiera v11 - Cloud</title>
     <style>
-        /* Twoje style CSS zostają bez zmian */
         :root {
             --bg-color: #f0f2f5; --container-bg: #ffffff; --primary: #8e44ad;
             --ania-color: #ff7675; --oliwier-color: #74b9ff; --text: #2d3436;
@@ -35,6 +34,7 @@
         .actions { position: absolute; right: 15px; top: 15px; display: flex; gap: 8px; }
         .action-btn { background: none; border: none; cursor: pointer; font-size: 18px; opacity: 0.6; }
         .status-badge { font-size: 10px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; font-weight: bold; }
+        .badge-nie { background: var(--status-nie); } .badge-trwa { background: var(--status-trwa); } .badge-zak { background: var(--status-zak); }
         .tag { font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: bold; margin-right: 5px; }
         .tag-Ania { background: #ffecec; color: var(--ania-color); }
         .tag-Oliwier { background: #eaf4ff; color: var(--oliwier-color); }
@@ -134,15 +134,6 @@
           messagingSenderId: "233798983321",
           appId: "1:233798983321:web:f7cfe4d2e179baa87a2208"
         };
-        const firebaseConfig = {
-            apiKey: "TWOJE_API_KEY",
-            authDomain: "TWÓJ_PROJEKT.firebaseapp.com",
-            projectId: "TWÓJ_ID",
-            storageBucket: "TWÓJ_PROJEKT.appspot.com",
-            messagingSenderId: "NUMER",
-            appId: "ID_APKI"
-        };
-        // -------------------------------------------------
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -162,7 +153,6 @@
             startSync();
         }
 
-        // SYNCHRONIZACJA Z CHMURĄ GOOGLE
         function startSync() {
             db.collection("tasks").onSnapshot((snapshot) => {
                 tasks = [];
@@ -185,7 +175,6 @@
         async function handleSubmit() {
             const title = document.getElementById('tTitle').value;
             if(!title) return alert("Wpisz tytuł!");
-
             const who = [];
             if(document.getElementById('pAnia').checked) who.push('Ania');
             if(document.getElementById('pOliwier').checked) who.push('Oliwier');
@@ -212,14 +201,9 @@
         }
 
         async function deleteTask(id) {
-            if(confirm("Usunąć?")) {
-                await db.collection("tasks").doc(id).delete();
-            }
+            if(confirm("Usunąć?")) await db.collection("tasks").doc(id).delete();
         }
 
-        // Pozostałe funkcje renderujące (createTaskCard, renderCalendar itp.) 
-        // zostały zoptymalizowane pod dane z Firebase
-        
         function createTaskCard(t) {
             const div = document.createElement('div');
             div.className = 'task-card';
@@ -234,7 +218,7 @@
                 <div style="font-weight:bold; margin:5px 0">${t.title}</div>
                 <div style="margin-top:10px">
                     ${t.who.map(p => `<span class="tag tag-${p}">${p}</span>`).join('')}
-                    <span class="status-badge badge-${t.status}">${t.status}</span>
+                    <span class="status-badge badge-${t.status}">${t.status === 'nie' ? 'Nie zaczęte' : (t.status === 'trwa' ? 'W trakcie' : 'Zakończone')}</span>
                 </div>
             `;
             return div;
@@ -283,6 +267,8 @@
             document.getElementById('tTime').value = t.time;
             document.getElementById('tEndTime').value = t.endTime || '';
             document.getElementById('tStatus').value = t.status;
+            document.getElementById('tLoc').value = t.location || '';
+            document.getElementById('tDesc').value = t.desc || '';
             document.getElementById('pAnia').checked = t.who.includes('Ania');
             document.getElementById('pOliwier').checked = t.who.includes('Oliwier');
             document.getElementById('cancelBtn').style.display = 'block';
@@ -290,13 +276,28 @@
 
         function resetForm() {
             document.getElementById('tTitle').value = '';
+            document.getElementById('tTime').value = '';
+            document.getElementById('tEndTime').value = '';
+            document.getElementById('tLoc').value = '';
+            document.getElementById('tDesc').value = '';
             document.getElementById('pAnia').checked = (currentUser === 'Ania');
             document.getElementById('pOliwier').checked = (currentUser === 'Oliwier');
         }
 
         function cancelEdit() { editId = null; resetForm(); document.getElementById('cancelBtn').style.display = 'none'; }
         function changeMonth(dir) { viewDate.setMonth(viewDate.getMonth() + dir); renderAll(); }
-        function openStatusView(s) { /* Analogicznie jak w Twoim kodzie */ }
+        
+        function openStatusView(s) {
+            const overlay = document.getElementById('statusOverlay');
+            const container = document.getElementById('overlayTasks');
+            const title = document.getElementById('overlayTitle');
+            const labels = {nie: 'Nie zaczęte', trwa: 'W trakcie', zak: 'Zakończone'};
+            title.innerText = labels[s];
+            container.innerHTML = '';
+            tasks.filter(t => t.status === s).forEach(t => container.appendChild(createTaskCard(t)));
+            overlay.style.display = 'block';
+        }
+        
         function closeOverlay() { document.getElementById('statusOverlay').style.display = 'none'; }
         
         document.querySelectorAll('.color-opt').forEach(opt => {
