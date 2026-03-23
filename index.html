@@ -3,124 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Planer v15</title>
+    <title>Planer v16 - Naprawiony</title>
     <style>
-        :root {
-            --bg: #f0f2f5; --ania: #ff7675; --oliwier: #74b9ff; --purple: #8e44ad;
-        }
-        * { box-sizing: border-box; }
-        body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        :root { --bg: #f0f2f5; --ania: #ff7675; --oliwier: #74b9ff; --purple: #8e44ad; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: sans-serif; background: var(--bg); padding: 10px; }
 
         /* LOGOWANIE */
-        #loginScreen { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5000; }
-        .user-btn { width: 90%; max-width: 300px; padding: 20px; margin: 10px; border: none; border-radius: 15px; color: white; font-size: 20px; font-weight: bold; cursor: pointer; }
+        #loginScreen { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
+        .u-btn { width: 80%; max-width: 300px; padding: 20px; margin: 10px; border: none; border-radius: 15px; color: white; font-size: 20px; font-weight: bold; }
 
-        /* UKŁAD GŁÓWNY */
-        .app-container { 
+        /* KONTENER GŁÓWNY */
+        .main-wrapper { 
             display: none; 
             max-width: 1200px; 
             margin: 0 auto; 
             gap: 20px; 
+            padding-top: 50px;
         }
 
-        /* Widok Laptop */
-        @media (min-width: 850px) {
-            .app-container.active { display: grid; grid-template-columns: 1fr 400px; }
-            .stats-bar { grid-column: span 2; }
-            .day-cell { height: 100px; } /* Normalna wysokość na laptopie */
+        /* LAPTOP - wymuszamy 2 kolumny */
+        @media (min-width: 900px) {
+            .main-wrapper.active { display: grid; grid-template-columns: 1fr 400px; }
+            .top-stats { grid-column: span 2; }
+            .cal-box { min-height: 600px; }
         }
 
-        /* Widok Telefon */
-        @media (max-width: 849px) {
-            .app-container.active { display: flex; flex-direction: column; }
-            .day-cell { aspect-ratio: 1; }
+        /* TELEFON - wymuszamy 1 kolumnę */
+        @media (max-width: 899px) {
+            .main-wrapper.active { display: flex; flex-direction: column; }
         }
 
         /* STATYSTYKI */
-        .stats-bar { display: flex; gap: 10px; margin-bottom: 5px; width: 100%; }
-        .stat-item { flex: 1; background: white; padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 4px solid #ddd; transition: 0.2s; }
-        .stat-item:hover { background: #f9f9f9; }
-        .stat-count { display: block; font-size: 22px; font-weight: bold; pointer-events: none; }
+        .top-stats { display: flex; gap: 10px; width: 100%; margin-bottom: 10px; }
+        .s-card { flex: 1; background: white; padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-bottom: 5px solid #ddd; }
+        .s-num { display: block; font-size: 24px; font-weight: bold; pointer-events: none; }
 
-        /* KALENDARZ */
-        .box { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 15px; }
-        .day-cell { border: 1px solid #eee; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; font-size: 18px; }
-        .day-cell.active { background: var(--purple); color: white; border-color: var(--purple); }
+        /* PUDEŁKA */
+        .white-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .grid-7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; }
+        .d-cell { border: 1px solid #eee; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
+        .d-cell.active { background: var(--purple); color: white; }
 
         /* FORMULARZ */
-        input, textarea, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; }
-        .btn-save { background: var(--purple); color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; font-size: 18px; cursor: pointer; }
+        input, textarea, select { width: 100%; padding: 12px; margin: 5px 0; border-radius: 10px; border: 1px solid #ccc; font-size: 16px; }
+        .save-btn { background: var(--purple); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; margin-top: 10px; cursor: pointer; }
 
-        /* OVERLAY */
-        #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 6000; padding: 20px; }
-        .overlay-content { background: white; padding: 25px; border-radius: 20px; max-width: 500px; margin: 40px auto; max-height: 80vh; overflow-y: auto; position: relative; }
-        
-        .logout { position: fixed; top: 10px; right: 10px; background: #333; color: white; border: none; padding: 8px 15px; border-radius: 10px; cursor: pointer; z-index: 1000; }
-        .task-card { background: #f4f4f4; padding: 10px; margin-bottom: 10px; border-radius: 10px; border-left: 5px solid var(--purple); }
+        /* OKNO OVERLAY */
+        #ov-back { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 8000; padding: 20px; }
+        .ov-front { background: white; padding: 20px; border-radius: 20px; max-width: 500px; margin: 20px auto; max-height: 80vh; overflow-y: auto; }
+
+        .logout-x { position: fixed; top: 10px; right: 10px; z-index: 500; padding: 5px 10px; background: #333; color: white; border-radius: 5px; font-size: 12px; }
+        .t-item { background: #f9f9f9; padding: 10px; margin: 10px 0; border-radius: 10px; border-left: 5px solid var(--purple); }
     </style>
 </head>
 <body>
 
     <div id="loginScreen">
-        <h1>Kto się loguje?</h1>
-        <button class="user-btn" style="background:var(--ania)" onclick="login('Ania')">Ania</button>
-        <button class="user-btn" style="background:var(--oliwier)" onclick="login('Oliwier')">Oliwier</button>
+        <h2 style="margin-bottom:20px">Kto wchodzi?</h2>
+        <button class="u-btn" style="background:var(--ania)" onclick="start('Ania')">Ania</button>
+        <button class="u-btn" style="background:var(--oliwier)" onclick="start('Oliwier')">Oliwier</button>
     </div>
 
-    <button class="logout" onclick="location.reload()">Wyloguj</button>
+    <button class="logout-x" onclick="location.reload()">Wyloguj</button>
 
-    <div id="overlay" onclick="if(event.target==this)closeOverlay()">
-        <div class="overlay-content">
-            <h2 id="ovTitle">Zadania</h2>
-            <div id="ovList"></div>
-            <button onclick="closeOverlay()" style="width:100%; padding:10px; margin-top:10px;">Zamknij</button>
+    <div id="ov-back" onclick="if(event.target==this)this.style.display='none'">
+        <div class="ov-front">
+            <h2 id="ov-t">Lista</h2>
+            <div id="ov-l"></div>
+            <button onclick="document.getElementById('ov-back').style.display='none'" style="width:100%; padding:10px; margin-top:15px">Zamknij</button>
         </div>
     </div>
 
-    <div class="app-container" id="mainApp">
-        <div class="stats-bar">
-            <div class="stat-item" style="border-color:#f1c40f" onclick="openStatus('nie')">
-                <span class="stat-count" id="cN">0</span><small>Czeka</small>
+    <div class="main-wrapper" id="app">
+        <div class="top-stats">
+            <div class="s-card" style="border-color:#f1c40f" onclick="showStatus('nie')">
+                <span class="s-num" id="s-n">0</span><small>Czeka</small>
             </div>
-            <div class="stat-item" style="border-color:#3498db" onclick="openStatus('trwa')">
-                <span class="stat-count" id="cT">0</span><small>W trakcie</small>
+            <div class="s-card" style="border-color:#3498db" onclick="showStatus('trwa')">
+                <span class="s-num" id="s-t">0</span><small>W trakcie</small>
             </div>
-            <div class="stat-item" style="border-color:#2ecc71" onclick="openStatus('zak')">
-                <span class="stat-count" id="cZ">0</span><small>Gotowe</small>
+            <div class="s-card" style="border-color:#2ecc71" onclick="showStatus('zak')">
+                <span class="s-num" id="s-z">0</span><small>Gotowe</small>
             </div>
         </div>
 
-        <div class="box">
-            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:15px;">
-                <button onclick="changeMonth(-1)" style="padding:10px;">← Poprzedni</button>
-                <h2 id="mTitle" style="margin:0"></h2>
-                <button onclick="changeMonth(1)" style="padding:10px;">Następny →</button>
+        <div class="white-card cal-box">
+            <div style="display:flex; justify-content: space-between; align-items: center;">
+                <button onclick="moveMonth(-1)" style="padding:5px 15px">←</button>
+                <h2 id="month-name"></h2>
+                <button onclick="moveMonth(1)" style="padding:5px 15px">→</button>
             </div>
-            <div id="calendarGrid" class="days-grid"></div>
+            <div id="calendar" class="grid-7"></div>
         </div>
 
-        <div class="box">
-            <h2 id="dTitle">Zadania</h2>
-            <div id="taskList"></div>
+        <div class="white-card">
+            <h2 id="day-label">Zadania</h2>
+            <div id="day-tasks"></div>
             <hr style="margin:20px 0; opacity:0.1">
-            <h3>+ Dodaj nowe</h3>
-            <input type="text" id="inTitle" placeholder="Co trzeba zrobić?">
-            <div style="display:flex; gap:10px">
-                <input type="time" id="inTime">
-                <input type="time" id="inTimeE">
+            <h3>+ Nowe</h3>
+            <input type="text" id="f-title" placeholder="Co robimy?">
+            <div style="display:flex; gap:5px"><input type="time" id="f-s"><input type="time" id="f-e"></div>
+            <textarea id="f-desc" placeholder="Szczegóły..."></textarea>
+            <div style="display:flex; justify-content: space-around; padding:10px 0">
+                <label><input type="checkbox" id="c-ania"> Ania</label>
+                <label><input type="checkbox" id="c-oli"> Oliwier</label>
             </div>
-            <textarea id="inDesc" placeholder="Dodatkowy opis..." rows="2"></textarea>
-            <div style="display:flex; justify-content: space-around; margin-bottom:15px">
-                <label style="cursor:pointer"><input type="checkbox" id="ckAnia"> Ania</label>
-                <label style="cursor:pointer"><input type="checkbox" id="ckOli"> Oliwier</label>
-            </div>
-            <select id="inStatus">
+            <select id="f-stat">
                 <option value="nie">Czeka</option>
                 <option value="trwa">W trakcie</option>
                 <option value="zak">Gotowe</option>
             </select>
-            <button class="btn-save" onclick="save()">DODAJ ZADANIE</button>
+            <button class="save-btn" onclick="saveTask()">ZAPISZ</button>
         </div>
     </div>
 
@@ -138,83 +132,77 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let selD = new Date(), viewD = new Date(), tasks = [];
+        let selD = new Date(), viewD = new Date(), allTasks = [];
 
-        function login(u) {
+        function start(u) {
             document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainApp').classList.add('active');
-            document.getElementById('ckAnia').checked = (u==='Ania');
-            document.getElementById('ckOli').checked = (u==='Oliwier');
+            document.getElementById('app').classList.add('active');
+            document.getElementById('c-ania').checked = (u==='Ania');
+            document.getElementById('c-oli').checked = (u==='Oliwier');
             db.collection("tasks").onSnapshot(s => {
-                tasks = [];
-                s.forEach(d => tasks.push({id: d.id, ...d.data()}));
-                render();
+                allTasks = [];
+                s.forEach(d => allTasks.push({id: d.id, ...d.data()}));
+                refresh();
             });
         }
 
-        function render() {
-            document.getElementById('cN').innerText = tasks.filter(t => t.status === 'nie').length;
-            document.getElementById('cT').innerText = tasks.filter(t => t.status === 'trwa').length;
-            document.getElementById('cZ').innerText = tasks.filter(t => t.status === 'zak').length;
+        function refresh() {
+            document.getElementById('s-n').innerText = allTasks.filter(t => t.status==='nie').length;
+            document.getElementById('s-t').innerText = allTasks.filter(t => t.status==='trwa').length;
+            document.getElementById('s-z').innerText = allTasks.filter(t => t.status==='zak').length;
 
-            const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
+            const grid = document.getElementById('calendar'); grid.innerHTML = '';
             const m = viewD.getMonth(), y = viewD.getFullYear();
             const names = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
-            document.getElementById('mTitle').innerText = `${names[m]} ${y}`;
-            
+            document.getElementById('month-name').innerText = `${names[m]} ${y}`;
             const first = (new Date(y, m, 1).getDay() + 6) % 7;
-            const daysCount = new Date(y, m + 1, 0).getDate();
-
+            const days = new Date(y, m + 1, 0).getDate();
             for(let i=0; i<first; i++) grid.appendChild(document.createElement('div'));
-            for(let d=1; d<=daysCount; d++) {
+            for(let d=1; d<=days; d++) {
                 const dt = new Date(y, m, d);
-                const cell = document.createElement('div');
-                cell.className = 'day-cell' + (dt.toDateString() === selD.toDateString() ? ' active' : '');
-                cell.innerText = d;
-                cell.onclick = () => { selD = dt; render(); };
-                grid.appendChild(cell);
+                const c = document.createElement('div');
+                c.className = 'd-cell' + (dt.toDateString() === selD.toDateString() ? ' active' : '');
+                c.innerText = d;
+                c.onclick = () => { selD = dt; refresh(); };
+                grid.appendChild(c);
             }
 
-            const list = document.getElementById('taskList'); list.innerHTML = '';
-            document.getElementById('dTitle').innerText = selD.toLocaleDateString('pl-PL', {day:'numeric', month:'long'});
-            tasks.filter(t => t.date === selD.toISOString().split('T')[0]).forEach(t => {
-                list.appendChild(createCard(t));
-            });
+            const list = document.getElementById('day-tasks'); list.innerHTML = '';
+            document.getElementById('day-label').innerText = selD.toLocaleDateString('pl-PL', {day:'numeric', month:'long'});
+            allTasks.filter(t => t.date === selD.toISOString().split('T')[0]).forEach(t => list.appendChild(item(t)));
         }
 
-        function createCard(t) {
-            const d = document.createElement('div');
-            d.className = 'task-card';
-            d.innerHTML = `<strong>${t.time || ''} ${t.title}</strong><br><small>${t.who.join(', ')}</small>
-            <button onclick="del('${t.id}')" style="float:right; border:none; background:none; cursor:pointer">🗑️</button>`;
-            return d;
+        function item(t) {
+            const div = document.createElement('div');
+            div.className = 't-item';
+            div.innerHTML = `<strong>${t.time || ''} ${t.title}</strong><br><small>${t.who.join(', ')}</small>
+            <button onclick="delTask('${t.id}')" style="float:right; border:none; background:none; cursor:pointer">🗑️</button>`;
+            return div;
         }
 
-        function openStatus(s) {
-            const list = document.getElementById('ovList'); list.innerHTML = '';
-            document.getElementById('ovTitle').innerText = s === 'nie' ? 'Czekają' : s === 'trwa' ? 'W trakcie' : 'Gotowe';
-            tasks.filter(t => t.status === s).forEach(t => list.appendChild(createCard(t)));
-            document.getElementById('overlay').style.display = 'block';
+        function showStatus(s) {
+            const l = document.getElementById('ov-l'); l.innerHTML = '';
+            document.getElementById('ov-t').innerText = s==='nie'?'Czeka':s==='trwa'?'W trakcie':'Gotowe';
+            allTasks.filter(t => t.status === s).forEach(t => l.appendChild(item(t)));
+            document.getElementById('ov-back').style.display = 'block';
         }
 
-        function closeOverlay() { document.getElementById('overlay').style.display = 'none'; }
-
-        async function save() {
-            const title = document.getElementById('inTitle').value;
+        async function saveTask() {
+            const title = document.getElementById('f-title').value;
             if(!title) return;
             const who = [];
-            if(document.getElementById('ckAnia').checked) who.push('Ania');
-            if(document.getElementById('ckOli').checked) who.push('Oliwier');
+            if(document.getElementById('c-ania').checked) who.push('Ania');
+            if(document.getElementById('c-oli').checked) who.push('Oliwier');
             await db.collection("tasks").add({
                 title, date: selD.toISOString().split('T')[0],
-                time: document.getElementById('inTime').value,
-                who, status: document.getElementById('inStatus').value
+                time: document.getElementById('f-s').value,
+                who, status: document.getElementById('f-stat').value
             });
-            document.getElementById('inTitle').value = '';
+            document.getElementById('f-title').value = '';
         }
 
-        async function del(id) { if(confirm("Usunąć?")) await db.collection("tasks").doc(id).delete(); }
-        function changeMonth(v) { viewD.setMonth(viewD.getMonth() + v); render(); }
+        async function delTask(id) { if(confirm("Usunąć?")) await db.collection("tasks").doc(id).delete(); }
+        function moveMonth(v) { viewD.setMonth(viewD.getMonth() + v); refresh(); }
     </script>
 </body>
 </html>
