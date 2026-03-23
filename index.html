@@ -3,64 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Planer v16 - Naprawiony</title>
+    <title>Planer v17 - Pełna Opcja</title>
     <style>
         :root { --bg: #f0f2f5; --ania: #ff7675; --oliwier: #74b9ff; --purple: #8e44ad; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: sans-serif; background: var(--bg); padding: 10px; }
 
-        /* LOGOWANIE */
         #loginScreen { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
-        .u-btn { width: 80%; max-width: 300px; padding: 20px; margin: 10px; border: none; border-radius: 15px; color: white; font-size: 20px; font-weight: bold; }
+        .u-btn { width: 80%; max-width: 300px; padding: 20px; margin: 10px; border: none; border-radius: 15px; color: white; font-size: 20px; font-weight: bold; cursor: pointer; }
 
-        /* KONTENER GŁÓWNY */
-        .main-wrapper { 
-            display: none; 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            gap: 20px; 
-            padding-top: 50px;
-        }
+        .main-wrapper { display: none; max-width: 1200px; margin: 0 auto; gap: 20px; padding-top: 20px; }
 
-        /* LAPTOP - wymuszamy 2 kolumny */
         @media (min-width: 900px) {
             .main-wrapper.active { display: grid; grid-template-columns: 1fr 400px; }
             .top-stats { grid-column: span 2; }
-            .cal-box { min-height: 600px; }
         }
+        @media (max-width: 899px) { .main-wrapper.active { display: flex; flex-direction: column; } }
 
-        /* TELEFON - wymuszamy 1 kolumnę */
-        @media (max-width: 899px) {
-            .main-wrapper.active { display: flex; flex-direction: column; }
-        }
-
-        /* STATYSTYKI */
         .top-stats { display: flex; gap: 10px; width: 100%; margin-bottom: 10px; }
         .s-card { flex: 1; background: white; padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-bottom: 5px solid #ddd; }
-        .s-num { display: block; font-size: 24px; font-weight: bold; pointer-events: none; }
+        .s-num { display: block; font-size: 24px; font-weight: bold; }
 
-        /* PUDEŁKA */
-        .white-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .white-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .grid-7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; }
-        .d-cell { border: 1px solid #eee; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
+        .d-cell { border: 1px solid #eee; border-radius: 8px; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; position: relative; }
         .d-cell.active { background: var(--purple); color: white; }
+        .dot { width: 5px; height: 5px; border-radius: 50%; background: red; position: absolute; bottom: 3px; }
 
-        /* FORMULARZ */
+        .t-item { background: #f9f9f9; padding: 12px; margin: 10px 0; border-radius: 12px; border-left: 6px solid #ccc; position: relative; }
+        .t-btns { position: absolute; right: 10px; top: 10px; display: flex; gap: 10px; }
+        .map-link { display: inline-block; margin-top: 5px; color: #0984e3; text-decoration: none; font-size: 13px; font-weight: bold; }
+
         input, textarea, select { width: 100%; padding: 12px; margin: 5px 0; border-radius: 10px; border: 1px solid #ccc; font-size: 16px; }
-        .save-btn { background: var(--purple); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .save-btn { background: var(--purple); color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        
+        .color-picker { display: flex; gap: 10px; margin: 10px 0; justify-content: center; }
+        .c-opt { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; }
+        .c-opt.selected { border-color: black; }
 
-        /* OKNO OVERLAY */
         #ov-back { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 8000; padding: 20px; }
         .ov-front { background: white; padding: 20px; border-radius: 20px; max-width: 500px; margin: 20px auto; max-height: 80vh; overflow-y: auto; }
-
         .logout-x { position: fixed; top: 10px; right: 10px; z-index: 500; padding: 5px 10px; background: #333; color: white; border-radius: 5px; font-size: 12px; }
-        .t-item { background: #f9f9f9; padding: 10px; margin: 10px 0; border-radius: 10px; border-left: 5px solid var(--purple); }
     </style>
 </head>
 <body>
 
     <div id="loginScreen">
-        <h2 style="margin-bottom:20px">Kto wchodzi?</h2>
+        <h2 style="margin-bottom:20px">Planer Ani i Oliwiera</h2>
         <button class="u-btn" style="background:var(--ania)" onclick="start('Ania')">Ania</button>
         <button class="u-btn" style="background:var(--oliwier)" onclick="start('Oliwier')">Oliwier</button>
     </div>
@@ -77,22 +66,16 @@
 
     <div class="main-wrapper" id="app">
         <div class="top-stats">
-            <div class="s-card" style="border-color:#f1c40f" onclick="showStatus('nie')">
-                <span class="s-num" id="s-n">0</span><small>Czeka</small>
-            </div>
-            <div class="s-card" style="border-color:#3498db" onclick="showStatus('trwa')">
-                <span class="s-num" id="s-t">0</span><small>W trakcie</small>
-            </div>
-            <div class="s-card" style="border-color:#2ecc71" onclick="showStatus('zak')">
-                <span class="s-num" id="s-z">0</span><small>Gotowe</small>
-            </div>
+            <div class="s-card" style="border-color:#f1c40f" onclick="showStatus('nie')"><span class="s-num" id="s-n">0</span><small>Czeka</small></div>
+            <div class="s-card" style="border-color:#3498db" onclick="showStatus('trwa')"><span class="s-num" id="s-t">0</span><small>W trakcie</small></div>
+            <div class="s-card" style="border-color:#2ecc71" onclick="showStatus('zak')"><span class="s-num" id="s-z">0</span><small>Gotowe</small></div>
         </div>
 
-        <div class="white-card cal-box">
+        <div class="white-card">
             <div style="display:flex; justify-content: space-between; align-items: center;">
-                <button onclick="moveMonth(-1)" style="padding:5px 15px">←</button>
+                <button onclick="moveMonth(-1)" style="padding:10px">←</button>
                 <h2 id="month-name"></h2>
-                <button onclick="moveMonth(1)" style="padding:5px 15px">→</button>
+                <button onclick="moveMonth(1)" style="padding:10px">→</button>
             </div>
             <div id="calendar" class="grid-7"></div>
         </div>
@@ -101,10 +84,19 @@
             <h2 id="day-label">Zadania</h2>
             <div id="day-tasks"></div>
             <hr style="margin:20px 0; opacity:0.1">
-            <h3>+ Nowe</h3>
+            <h3 id="form-mode">+ Nowe zadanie</h3>
             <input type="text" id="f-title" placeholder="Co robimy?">
+            <input type="text" id="f-loc" placeholder="Gdzie? (Lokalizacja)">
             <div style="display:flex; gap:5px"><input type="time" id="f-s"><input type="time" id="f-e"></div>
             <textarea id="f-desc" placeholder="Szczegóły..."></textarea>
+            
+            <div class="color-picker">
+                <div class="c-opt selected" style="background:#8e44ad" data-color="#8e44ad" onclick="selCol(this)"></div>
+                <div class="c-opt" style="background:#e67e22" data-color="#e67e22" onclick="selCol(this)"></div>
+                <div class="c-opt" style="background:#2ecc71" data-color="#2ecc71" onclick="selCol(this)"></div>
+                <div class="c-opt" style="background:#3498db" data-color="#3498db" onclick="selCol(this)"></div>
+            </div>
+
             <div style="display:flex; justify-content: space-around; padding:10px 0">
                 <label><input type="checkbox" id="c-ania"> Ania</label>
                 <label><input type="checkbox" id="c-oli"> Oliwier</label>
@@ -114,7 +106,8 @@
                 <option value="trwa">W trakcie</option>
                 <option value="zak">Gotowe</option>
             </select>
-            <button class="save-btn" onclick="saveTask()">ZAPISZ</button>
+            <input type="hidden" id="edit-id">
+            <button class="save-btn" id="btn-save" onclick="saveTask()">DODAJ ZADANIE</button>
         </div>
     </div>
 
@@ -132,7 +125,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let selD = new Date(), viewD = new Date(), allTasks = [];
+        let selD = new Date(), viewD = new Date(), allTasks = [], chosenCol = "#8e44ad";
 
         function start(u) {
             document.getElementById('loginScreen').style.display = 'none';
@@ -160,10 +153,15 @@
             for(let i=0; i<first; i++) grid.appendChild(document.createElement('div'));
             for(let d=1; d<=days; d++) {
                 const dt = new Date(y, m, d);
+                const iso = dt.toISOString().split('T')[0];
                 const c = document.createElement('div');
                 c.className = 'd-cell' + (dt.toDateString() === selD.toDateString() ? ' active' : '');
                 c.innerText = d;
-                c.onclick = () => { selD = dt; refresh(); };
+                if(allTasks.some(t => t.date === iso)) {
+                    const dot = document.createElement('div'); dot.className = 'dot';
+                    c.appendChild(dot);
+                }
+                c.onclick = () => { selD = dt; refresh(); resetForm(); };
                 grid.appendChild(c);
             }
 
@@ -175,9 +173,48 @@
         function item(t) {
             const div = document.createElement('div');
             div.className = 't-item';
-            div.innerHTML = `<strong>${t.time || ''} ${t.title}</strong><br><small>${t.who.join(', ')}</small>
-            <button onclick="delTask('${t.id}')" style="float:right; border:none; background:none; cursor:pointer">🗑️</button>`;
+            div.style.borderLeftColor = t.color || var(--purple);
+            div.innerHTML = `
+                <div class="t-btns">
+                    <button onclick="editT('${t.id}')" style="background:none; border:none; cursor:pointer">✏️</button>
+                    <button onclick="delTask('${t.id}')" style="background:none; border:none; cursor:pointer">🗑️</button>
+                </div>
+                <strong>${t.time || ''} ${t.title}</strong><br>
+                <small>${t.who.join(', ')}</small>
+                ${t.loc ? `<br><a class="map-link" href="https://www.google.com/maps/search/${encodeURIComponent(t.loc)}" target="_blank">🌍 Mapa: ${t.loc}</a>` : ''}
+            `;
             return div;
+        }
+
+        function editT(id) {
+            const t = allTasks.find(x => x.id === id);
+            document.getElementById('f-title').value = t.title;
+            document.getElementById('f-loc').value = t.loc || '';
+            document.getElementById('f-s').value = t.time || '';
+            document.getElementById('f-e').value = t.endTime || '';
+            document.getElementById('f-desc').value = t.desc || '';
+            document.getElementById('f-stat').value = t.status;
+            document.getElementById('c-ania').checked = t.who.includes('Ania');
+            document.getElementById('c-oli').checked = t.who.includes('Oliwier');
+            document.getElementById('edit-id').value = id;
+            document.getElementById('form-mode').innerText = "📝 Edytuj zadanie";
+            document.getElementById('btn-save').innerText = "ZAPISZ ZMIANY";
+            chosenCol = t.color || "#8e44ad";
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        function resetForm() {
+            document.getElementById('f-title').value = '';
+            document.getElementById('f-loc').value = '';
+            document.getElementById('edit-id').value = '';
+            document.getElementById('form-mode').innerText = "+ Nowe zadanie";
+            document.getElementById('btn-save').innerText = "DODAJ ZADANIE";
+        }
+
+        function selCol(el) {
+            document.querySelectorAll('.c-opt').forEach(x => x.classList.remove('selected'));
+            el.classList.add('selected');
+            chosenCol = el.dataset.color;
         }
 
         function showStatus(s) {
@@ -189,16 +226,25 @@
 
         async function saveTask() {
             const title = document.getElementById('f-title').value;
+            const id = document.getElementById('edit-id').value;
             if(!title) return;
             const who = [];
             if(document.getElementById('c-ania').checked) who.push('Ania');
             if(document.getElementById('c-oli').checked) who.push('Oliwier');
-            await db.collection("tasks").add({
+            
+            const data = {
                 title, date: selD.toISOString().split('T')[0],
+                loc: document.getElementById('f-loc').value,
                 time: document.getElementById('f-s').value,
-                who, status: document.getElementById('f-stat').value
-            });
-            document.getElementById('f-title').value = '';
+                endTime: document.getElementById('f-e').value,
+                desc: document.getElementById('f-desc').value,
+                who, status: document.getElementById('f-stat').value,
+                color: chosenCol
+            };
+
+            if(id) await db.collection("tasks").doc(id).update(data);
+            else await db.collection("tasks").add(data);
+            resetForm();
         }
 
         async function delTask(id) { if(confirm("Usunąć?")) await db.collection("tasks").doc(id).delete(); }
