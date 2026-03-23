@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Planer v18</title>
+    <title>Planer v20</title>
     <style>
         :root { --bg: #f0f2f5; --ania: #ff7675; --oliwier: #74b9ff; --purp: #8e44ad; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: sans-serif; background: var(--bg); padding: 10px; line-height: 1.4; }
 
-        /* Login */
-        #loginScreen { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
-        .u-btn { width: 80%; max-width: 300px; padding: 18px; margin: 10px; border: none; border-radius: 15px; color: white; font-size: 18px; font-weight: bold; cursor: pointer; }
+        /* EKRANY STARTOWE */
+        #passScreen, #loginScreen { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; padding: 20px; }
+        #loginScreen { display: none; }
 
-        /* Layout */
+        .u-btn { width: 80%; max-width: 300px; padding: 18px; margin: 10px; border: none; border-radius: 15px; color: white; font-size: 18px; font-weight: bold; cursor: pointer; }
+        input[type="password"], input[type="text"], textarea, select { width: 100%; max-width: 300px; padding: 15px; margin: 10px 0; border-radius: 12px; border: 2px solid #ddd; font-size: 16px; text-align: center; }
+
+        /* LAYOUT */
         .wrapper { display: none; max-width: 1100px; margin: 0 auto; flex-direction: column; gap: 15px; }
         @media (min-width: 850px) { 
             .wrapper.active { display: grid; grid-template-columns: 1fr 380px; padding-top: 20px; }
@@ -21,44 +24,45 @@
         }
         @media (max-width: 849px) { .wrapper.active { display: flex; } }
 
-        /* Stats */
         .stats { display: flex; gap: 8px; margin-bottom: 5px; }
         .s-card { flex: 1; background: white; padding: 12px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 4px solid #ddd; }
         .s-num { display: block; font-size: 20px; font-weight: bold; }
 
-        /* Boxes */
         .card { background: white; padding: 15px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; }
         .cell { border: 1px solid #f0f0f0; border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; font-size: 14px; position: relative; }
         .cell.active { background: var(--purp); color: white; }
-        .dot { width: 4px; height: 4px; background: red; border-radius: 50%; position: absolute; bottom: 3px; }
+        .dot { width: 5px; height: 5px; background: #ff7675; border-radius: 50%; position: absolute; bottom: 4px; }
 
-        /* Task Cards */
-        .task { background: #f8f9fa; padding: 10px; margin: 8px 0; border-radius: 10px; border-left: 5px solid #ccc; position: relative; }
-        .t-actions { position: absolute; right: 8px; top: 8px; }
-        .t-btn { background: none; border: none; cursor: pointer; font-size: 16px; margin-left: 5px; }
-        .map-b { display: inline-block; margin-top: 4px; color: #0984e3; text-decoration: none; font-size: 12px; font-weight: bold; }
+        .task { background: #f8f9fa; padding: 12px; margin: 8px 0; border-radius: 12px; border-left: 6px solid #ccc; position: relative; text-align: left; }
+        .t-actions { position: absolute; right: 10px; top: 10px; }
+        .t-btn { background: none; border: none; cursor: pointer; font-size: 18px; margin-left: 8px; }
+        .map-b { display: inline-block; margin-top: 6px; color: #0984e3; text-decoration: none; font-size: 13px; font-weight: bold; }
 
-        /* Form */
-        input, textarea, select { width: 100%; padding: 10px; margin: 4px 0; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
-        .colors { display: flex; gap: 8px; margin: 8px 0; justify-content: center; }
-        .c-circle { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+        .colors { display: flex; gap: 10px; margin: 10px 0; justify-content: center; }
+        .c-circle { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; }
         .c-circle.sel { border-color: #333; }
-        .btn-main { background: var(--purp); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        .btn-main { background: var(--purp); color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
 
-        /* Overlay */
-        #ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 8000; padding: 20px; }
-        .ov-c { background: white; padding: 20px; border-radius: 20px; max-width: 500px; margin: auto; max-height: 85vh; overflow-y: auto; position: relative; top: 50%; transform: translateY(-50%); }
+        #ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 8000; padding: 20px; }
+        .ov-c { background: white; padding: 25px; border-radius: 25px; max-width: 500px; margin: auto; max-height: 85vh; overflow-y: auto; position: relative; top: 50%; transform: translateY(-50%); }
 
-        .logout { position: fixed; top: 5px; right: 5px; z-index: 1000; padding: 4px 8px; background: #333; color: white; border-radius: 5px; font-size: 10px; border: none; }
+        .logout { position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 6px 12px; background: #333; color: white; border-radius: 8px; font-size: 12px; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
+    <div id="passScreen">
+        <h2 style="margin-bottom:20px">🔒 Podaj hasło</h2>
+        <input type="password" id="passInput" placeholder="Hasło...">
+        <button class="u-btn" style="background:#333" onclick="checkPass()">Wejdź</button>
+        <p id="passError" style="color:red; margin-top:10px; display:none;">Błędne hasło!</p>
+    </div>
+
     <div id="loginScreen">
-        <h2 style="margin-bottom:20px">Planer Ani i Oliwiera</h2>
-        <button class="u-btn" style="background:var(--ania)" onclick="init('Ania')">Ania</button>
-        <button class="u-btn" style="background:var(--oliwier)" onclick="init('Oliwier')">Oliwier</button>
+        <h2 style="margin-bottom:20px">Kto używa planera?</h2>
+        <button class="u-btn" style="background:var(--ania)" onclick="initApp('Ania')">Ania</button>
+        <button class="u-btn" style="background:var(--oliwier)" onclick="initApp('Oliwier')">Oliwier</button>
     </div>
 
     <button class="logout" onclick="location.reload()">Wyloguj</button>
@@ -67,35 +71,35 @@
         <div class="ov-c">
             <h2 id="ov-t">Lista</h2>
             <div id="ov-l"></div>
-            <button onclick="document.getElementById('ov').style.display='none'" style="width:100%; padding:10px; margin-top:15px">Zamknij</button>
+            <button onclick="document.getElementById('ov').style.display='none'" style="width:100%; padding:12px; margin-top:20px; border-radius:10px; border:1px solid #ddd; background:#eee; cursor:pointer">Zamknij</button>
         </div>
     </div>
 
     <div class="wrapper" id="app">
         <div class="stats">
-            <div class="s-card" style="border-color:#f1c40f" onclick="showS('nie')"><span class="s-num" id="sn">0</span><small>Czeka</small></div>
-            <div class="s-card" style="border-color:#3498db" onclick="showS('trwa')"><span class="s-num" id="st">0</span><small>Trwa</small></div>
-            <div class="s-card" style="border-color:#2ecc71" onclick="showS('zak')"><span class="s-num" id="sz">0</span><small>Gotowe</small></div>
+            <div class="s-card" style="border-color:#f1c40f" onclick="showS('nie')"><span class="s-num" id="sn">0</span><small>Nie zaczęte</small></div>
+            <div class="s-card" style="border-color:#3498db" onclick="showS('trwa')"><span class="s-num" id="st">0</span><small>W trakcie</small></div>
+            <div class="s-card" style="border-color:#2ecc71" onclick="showS('zak')"><span class="s-num" id="sz">0</span><small>Zakończone</small></div>
         </div>
 
         <div class="card">
-            <div style="display:flex; justify-content: space-between; align-items: center;">
-                <button onclick="chM(-1)" style="padding:5px 10px">←</button>
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:10px;">
+                <button onclick="chM(-1)" style="padding:8px 15px; border-radius:10px; border:1px solid #eee; background:white; cursor:pointer">←</button>
                 <h3 id="m-name"></h3>
-                <button onclick="chM(1)" style="padding:5px 10px">→</button>
+                <button onclick="chM(1)" style="padding:8px 15px; border-radius:10px; border:1px solid #eee; background:white; cursor:pointer">→</button>
             </div>
             <div id="calendar" class="grid"></div>
         </div>
 
         <div class="card">
-            <h3 id="d-name">Dzisiaj</h3>
+            <h3 id="d-name" style="margin-bottom:10px">Dzisiaj</h3>
             <div id="task-list"></div>
-            <hr style="margin:15px 0; opacity:0.1">
-            <h4 id="f-mode">+ Nowe zadanie</h4>
-            <input type="text" id="f-t" placeholder="Co robimy?">
-            <input type="text" id="f-l" placeholder="Gdzie? (Lokalizacja)">
-            <div style="display:flex; gap:5px"><input type="time" id="f-h1"><input type="time" id="f-h2"></div>
-            <textarea id="f-d" placeholder="Opis..." rows="2"></textarea>
+            <hr style="margin:20px 0; opacity:0.1">
+            <h4 id="f-mode" style="margin-bottom:10px">+ Nowe zadanie</h4>
+            <input type="text" id="f-t" placeholder="Co robimy?" style="max-width:100%; text-align:left">
+            <input type="text" id="f-l" placeholder="Gdzie? (Lokalizacja)" style="max-width:100%; text-align:left">
+            <div style="display:flex; gap:10px"><input type="time" id="f-h1" style="max-width:100%"><input type="time" id="f-h2" style="max-width:100%"></div>
+            <textarea id="f-d" placeholder="Dodatkowy opis..." rows="2" style="max-width:100%; border: 2px solid #ddd; border-radius:12px; padding:10px; font-family:sans-serif; margin:5px 0"></textarea>
             
             <div class="colors">
                 <div class="c-circle sel" style="background:#8e44ad" data-c="#8e44ad" onclick="sCol(this)"></div>
@@ -105,12 +109,12 @@
                 <div class="c-circle" style="background:#e84393" data-c="#e84393" onclick="sCol(this)"></div>
             </div>
 
-            <div style="display:flex; justify-content: space-around; padding:5px 0">
-                <label><input type="checkbox" id="c-a"> Ania</label>
-                <label><input type="checkbox" id="c-o"> Oliwier</label>
+            <div style="display:flex; justify-content: space-around; padding:10px 0; background:#f9f9f9; border-radius:12px; margin-bottom:10px;">
+                <label style="cursor:pointer"><input type="checkbox" id="c-a"> Ania</label>
+                <label style="cursor:pointer"><input type="checkbox" id="c-o"> Oliwier</label>
             </div>
-            <select id="f-st">
-                <option value="nie">Czeka</option>
+            <select id="f-st" style="max-width:100%">
+                <option value="nie">Nie zaczęte</option>
                 <option value="trwa">W trakcie</option>
                 <option value="zak">Zakończone</option>
             </select>
@@ -135,7 +139,17 @@
 
         let selD = new Date(), viewD = new Date(), tasks = [], curC = "#8e44ad";
 
-        function init(u) {
+        function checkPass() {
+            const pass = document.getElementById('passInput').value;
+            if(pass === "kochamcieoliwier13102025") { 
+                document.getElementById('passScreen').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'flex';
+            } else {
+                document.getElementById('passError').style.display = 'block';
+            }
+        }
+
+        function initApp(u) {
             document.getElementById('loginScreen').style.display='none';
             document.getElementById('app').classList.add('active');
             document.getElementById('c-a').checked = (u==='Ania');
@@ -175,7 +189,7 @@
 
             const l = document.getElementById('task-list'); l.innerHTML = '';
             document.getElementById('d-name').innerText = selD.toLocaleDateString('pl-PL', {day:'numeric', month:'long'});
-            tasks.filter(t => t.date === selD.toISOString().split('T')[0]).forEach(t => l.appendChild(makeT(t)));
+            tasks.filter(t => t.date === selD.toISOString().split('T')[0]).sort((a,b)=> (a.time||'').localeCompare(b.time||'')).forEach(t => l.appendChild(makeT(t)));
         }
 
         function makeT(t) {
@@ -213,6 +227,8 @@
 
         function resetF() {
             document.getElementById('f-t').value = ''; document.getElementById('f-l').value = '';
+            document.getElementById('f-h1').value = ''; document.getElementById('f-h2').value = '';
+            document.getElementById('f-d').value = '';
             document.getElementById('e-id').value = ''; document.getElementById('f-mode').innerText = "+ Nowe zadanie";
             document.getElementById('b-s').innerText = "DODAJ ZADANIE";
         }
@@ -225,7 +241,7 @@
 
         function showS(s) {
             const l = document.getElementById('ov-l'); l.innerHTML = '';
-            document.getElementById('ov-t').innerText = s==='nie'?'Czeka':s==='trwa'?'Trwa':'Gotowe';
+            document.getElementById('ov-t').innerText = s==='nie'?'Nie zaczęte':s==='trwa'?'W trakcie':'Zakończone';
             tasks.filter(t => t.status === s).forEach(t => l.appendChild(makeT(t)));
             document.getElementById('ov').style.display = 'block';
         }
